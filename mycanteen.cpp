@@ -1,874 +1,884 @@
-#include<iostream>
-#include<fstream>
-#include<windows.h>
-#include<dos.h>
 #include<stdio.h>
-#include<cstdlib>
-#include<string>
 #include<conio.h>
-using namespace std;
-COORD coord={0,0};
+#include<stdlib.h>
+#include<string.h>
+#include<ctype.h>
+#include<windows.h>
+
+#define ANS 15
+#define ACS 4
+COORD coord= {0,0}; // this is global variable
 void gotoxy(int x,int y)
 {
     coord.X=x;
     coord.Y=y;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE),coord);
 }
-int snackspr,maggipr,sdpr;
-int snacksqty,maggiqty,sdqty;
-void billpage();
-void empjump();
-void billjump();
-void handlecust();
-class login;
-class store;
+/*declaration of checking functions*/
+void c_code(char[]);
+int check(char[]);
 
-class order;
-class billing;
-class store
+/*structure declaration*/
+typedef struct
 {
-    public:
-        string item;
-        string name;
-        int amt;
-        int ch;
-        int rate;
-        int qty=0;
-        void mnginvt();
-        void storepageswitch();
-        void price();
-        void viewinvt();
-        void quantity();
-        void storepage()
-        {
-            storepageswitch();
-        }
-};
-void store::storepageswitch()
-{
-    system("CLS");
-    gotoxy(40,1);cout<<"MY CANTEEN";
-    gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-    cout<<"     PLEASE UPDATE THE PRICE AND QUANTITY OF"<<endl;
-    cout<<"     ITEMS IN MANAGE INVENTORY BEFORE PROCEEDING"<<endl<<endl;
-    cout<<"     1. MANAGE INVENTORY"<<endl;
-    cout<<"     2. VIEW INVENTORY"<<endl;
-    cout<<"     3. TAKE ORDER"<<endl;
-    cout<<"     4. VIEW SALES RECORD"<<endl;
-    cout<<"     5. EXIT"<<endl<<endl;
-    cout<<"     ENTER CHOICE"<<endl;
-    cout<<"     ";cin>>ch;
-    while(ch!=1||ch!=2||ch!=3)
-    {
-        switch(ch)
-        {
-            case 1:
-                mnginvt();
-                break;
-            case 2:
-                viewinvt();
-                break;
-            case 3:
-                handlecust();
-                break;
-            case 4:
-                billjump();
-                break;
-            case 5:
-                exit(0);
-            default:
-                cout<<endl<<"     INVALID CHOICE"<<endl<<endl;
-                cout<<"     ENTER CHOICE"<<endl<<endl;
-                cout<<"     ";cin>>ch;
-        }
-    }
-}
-void store::mnginvt()
-{
-    system("CLS");
-    gotoxy(40,1);cout<<"MY CANTEEN";
-    gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-    cout<<"     1. EDIT PRICE"<<endl;
-    cout<<"     2. ENTER QUANTITY"<<endl<<endl;
-    cout<<"     ENTER CHOICE"<<endl;
-    cout<<"     ";cin>>ch;
-    while(ch!=1||ch!=2)
-    {
-        switch(ch)
-        {
-            case 1:
-                price();
-                break;
-            case 2:
-                quantity();
-                break;
-            default:
-                cout<<endl<<"     INVALID CHOICE"<<endl<<endl;
-                cout<<"     ENTER CHOICE"<<endl<<endl;
-                cout<<"     ";cin>>ch;
-        }
-    }
-}
-void store::price()
-{
-    system("CLS");
-    gotoxy(40,1);cout<<"MY CANTEEN";
-    gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-    cout<<"     CURRENT INVENTORY"<<endl;
-    ifstream currprice("PRICE.txt");
-    cout<<"     "<<"ITEM"<<" - "<<"PRICE"<<endl;
-    cout<<"     ------------"<<endl;
-    while(currprice>>item>>rate)
-    {
-        cout<<"     "<<item<<" - "<<rate<<endl;
-    }
-    currprice.close();
-    remove("PRICE.txt");
-    fstream editprice("PRICE.txt",ios::app);
-    cout<<endl<<"     ENTER PRICE OF SNACKS"<<endl;
-    cout<<"     ";cin>>snackspr;cout<<endl;
-    editprice<<"SNACKS"<<' '<<snackspr<<endl;
-    cout<<"     ENTER PRICE OF MAGGI"<<endl;
-    cout<<"     ";cin>>maggipr;cout<<endl;
-    editprice<<"MAGGI"<<' '<<maggipr<<endl;
-    cout<<"     ENTER PRICE OF SOFT DRINK"<<endl;
-    cout<<"     ";cin>>sdpr;cout<<endl;
-    editprice<<"SOFTDRINK"<<' '<<sdpr<<endl;;
-    editprice.close();
+    char name[ANS],code[ACS];
+    float rate;
+    int quantity;
+} rec;
+rec item;
 
-    system("CLS");cout<<endl;
-    gotoxy(40,0);cout<<"MY CANTEEN";
-    gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-    cout<<"     NEW INVENTORY"<<endl;
-    ifstream viewprice("PRICE.txt");
-    cout<<"     "<<"ITEM"<<" - "<<"PRICE"<<endl;
-    cout<<"     ------------"<<endl;
-    while(viewprice>>item>>rate)
-    {
-        cout<<"     "<<item<<" - "<<rate<<endl;
-    }
-    viewprice.close();
-    cout<<endl<<"     PRESS ANY KEY TO CONTINUE"<<endl;
-    cout<<"     ";getch();
-    storepage();
-}
-void store::quantity()
-{
-    system("CLS");
-    gotoxy(40,1);cout<<"MY CANTEEN";
-    gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-    cout<<"     CURRENT INVENTORY"<<endl;
-    ifstream currqty("QUANTITY.txt");
-    cout<<"     "<<"ITEM"<<" - "<<"QUANTITY"<<endl;
-    cout<<"     ---------------"<<endl;
-    while(currqty>>item>>qty)
-    {
-        cout<<"     "<<item<<" - "<<qty<<endl;
-    }
-    currqty.close();
-    remove("QUANTITY.txt");
-    fstream editqty("QUANTITY.txt",ios::app);
-    cout<<endl<<"     ENTER QUANTITY OF SNACKS"<<endl;
-    cout<<"     ";cin>>snacksqty;cout<<endl;
-    editqty<<"SNACKS"<<' '<<snacksqty<<endl;
-    cout<<"     ENTER QUANTITY OF MAGGI"<<endl;
-    cout<<"     ";cin>>maggiqty;cout<<endl;
-    editqty<<"MAGGI"<<' '<<maggiqty<<endl;
-    cout<<"     ENTER QUANTITY OP SOFT DRINK"<<endl;
-    cout<<"     ";cin>>sdqty;cout<<endl;
-    editqty<<"SOFTDRINK"<<' '<<sdqty<<endl;
-    editqty.close();
-    system("CLS");
-    gotoxy(40,1);cout<<"MY CANTEEN";
-    gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-    cout<<"     NEW INVENTORY"<<endl;
-    cout<<"     "<<"ITEM"<<" - "<<"QUANTITY"<<endl;
-    cout<<"     --------------------"<<endl;
-    ifstream viewqty("QUANTITY.txt");
-    while(viewqty>>item>>qty)
-    {
-        cout<<"     ";cout<<item<<" - "<<qty<<endl;
-    }
-    viewqty.close();
-    cout<<endl<<"     PRESS ANY KEY TO CONTINUE"<<endl;
-    cout<<"     ";getch();
-    storepage();
-}
-void store::viewinvt()
-{
-    system("CLS");
-    gotoxy(40,1);cout<<"MY CANTEEN";
-    gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-    cout<<"     PRICE OF ITEMS IN CANTEEN"<<endl;
-    cout<<"     ITEM - PRICE"<<endl;
-    cout<<"     ------------"<<endl;
-    ifstream vwpr("PRICE.txt");
-    while(vwpr>>item>>rate)
-    {
-        cout<<"     ";cout<<item<<" - "<<rate<<endl;
-    }
-    vwpr.close();
-    cout<<endl<<"     QUANTITY OF ITEMS IN CANTEEN"<<endl;
-    cout<<"     ITEM - QUANTITY"<<endl;
-    cout<<"     ---------------"<<endl;
-    ifstream vwqt("QUANTITY.txt");
-    while(vwqt>>item>>rate)
-    {
-        cout<<"     ";cout<<item<<" - "<<rate<<endl;
-    }
-    vwqt.close();
-    cout<<endl<<"     PRESS ANY KEY TO CONTINUE"<<endl;
-    cout<<"     ";getch();
-    storepage();
-}
-class billing
-{
-    public:
-        string name;
-        int cost1,cost2,cost3,qty,totalcost;
-        store s;
-        int amt;
-        char dec;
-        void viewstat();
-        void clearstat();
-        billing()
-        {
-            cost1=0;
-            cost2=0;
-            cost3=0;
-        }
-        void bill1(int qty)
-        {
-            cost1=0;
-            cost1=snackspr*qty;
-        }
-        void bill2(int qty)
-        {
-            cost2=0;
-            cost2=maggipr*qty;
-        }
-        void bill3(int qty)
-        {
-            cost3=0;
-            cost3=sdpr*qty;
-        }
-        void bill()
-        {
-            system("CLS");
-            gotoxy(40,1);cout<<"MY CANTEEN";
-            gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-            totalcost=cost1+cost2+cost3;
-            cout<<"     ENTER NAME OF CUSTOMER"<<endl;
-            cout<<"     ";cin>>name;cout<<endl;
-            system("CLS");
-            gotoxy(40,1);cout<<"MY CANTEEN";
-            gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-            cout<<"     BILL : PAY FOLLOWING AMOUNT "<<endl;
-            cout<<"     CUSTOMER NAME : "<<name<<endl;
-            cout<<"     TOTAL COST IS : "<<"$"<<totalcost<<endl;;
-            cout<<"     THANK YOU MY"<<endl;
-            fstream billmod("SALESRECORD.txt",ios::app);
-            billmod<<name<<' '<<totalcost<<endl;
-            billmod.close();
-            cout<<endl<<"     PRESS ANY KEY TO CONTINUE"<<endl;
-            cout<<"     ";getch();
-            billpage();
-        }
-};
-void billing::viewstat()
-{
-    system("CLS");
-    gotoxy(40,1);cout<<"MY CANTEEN";
-    gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-    ifstream viewsr("SALESRECORD.txt");
-    cout<<"     NAME - AMOUNT"<<endl;
-    cout<<"     -------------"<<endl;
-    while(viewsr>>name>>amt)
-    {
-        cout<<"     "<<name<<" - "<<"$"<<amt<<endl;
-    }
-    viewsr.close();
-    cout<<endl<<"     PRESS ANY KEY TO CONTINUE"<<endl;
-    cout<<"     ";getch();
-    s.storepage();
-}
-void billing::clearstat()
-{
-    system("CLS");
-    gotoxy(40,1);cout<<"MY CANTEEN";
-    gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-    cout<<"     CLEAR SALES RECORD [Y]"<<endl;
-    cout<<"     ";cin>>dec;
-    if(dec=='Y')
-    {
-        remove("SALESRECORD.txt");
-        cout<<endl<<"     SALES RECORD CLEARED"<<endl;
-        cout<<endl<<"     PRESS ANY KEY TO CONTINUE"<<endl;
-        cout<<"     ";getch();
-        remove("STUDENT.txt");
-        ifstream newsr("STUDENT.txt");
-        newsr.close();
-        empjump();
-    }
-    else
-    {
-        cout<<endl<<"     SALES RECORD ARE NOT CLEARED"<<endl;
-        cout<<endl<<"     PRESS ANY KEY TO CONTINUE"<<endl;
-        cout<<"     ";getch();
-        empjump();
+/*declaration of display functions*/
+void curser(int);
+void dbill();
+void d_mainmenu();
+void display(rec *,int,int);
+void window(int,int,int,int);
+void dis_con();
+void d_search();
+void highlight(int,int);
 
-    }
+/*declaration of main menu functions*/
+void bill() ;
+void edit();
+void add();
+void del();
+void exit();
+
+/*declaration of display submenu functions*/
+void d_code();
+void d_rate();
+void d_quan();
+void d_all();
+
+void login()
+{
+	int a=0,i=0;
+    char uname[10],c=' '; 
+    char pword[10],code[10];
+    char user[10]="user";
+    char pass[10]="pass";
+    do
+{
+	
+    printf("\n  \xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\  LOGIN FORM  \xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\xdb\   ");
+    printf(" \n\n                  ENTER USERNAME:-");
+	scanf("%s", &uname); 
+	printf(" \n\n                  ENTER PASSWORD:-");
+	while(i<10)
+	{
+	    pword[i]=getch();
+	    c=pword[i];
+	    if(c==13) break;
+	    else printf("*");
+	    i++;
+	}
+	pword[i]='\0';
+	//char code=pword;
+	i=0;
+	//scanf("%s",&pword); 
+		if(strcmp(uname,"user")==0 && strcmp(pword,"pass")==0)
+	{
+	printf("  \n\n\n       WELCOME TO CAFETERIA ORDER SYSTEM !!!! LOGIN IS SUCCESSFUL");
+	printf("\n\n\n\t\t\t\tPress any key to continue...");
+	getch();//holds the screen
+	break;
+	}
+	else
+	{
+		printf("\n        SORRY !!!!  LOGIN IS UNSUCESSFUL");
+		a++;
+		
+		getch();//holds the screen
+		
+	}
 }
-class order
-{
-    public:
-        int tqty;
-        string titem;
-        billing b;
-        int invtqty;
-        string invtitem;
-        char dec;
-        int ch;
-        int qty;
-        void orderitem1();
-        void orderitem2();
-        void orderitem3();
-        void orderpageswitch();
-        void orderpage()
-        {
-            system("CLS");
-            gotoxy(40,1);cout<<"MY CANTEEN";
-            gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-            cout<<"     1. SNACKS"<<endl;
-            cout<<"     2. MAGGI"<<endl;
-            cout<<"     3. SOFT DRINK"<<endl;
-            cout<<"     4. EXIT"<<endl<<endl;
-            cout<<"     ENTER ITEM TO ORDER"<<endl;
-            cout<<"     ";cin>>ch;
-            orderpageswitch();
-        }
-};
-void order::orderpageswitch()
-{
-    while(ch!=1||ch!=2||ch!=3||ch!=4)
-    {
-        switch(ch)
-        {
-            case 1:
-                orderitem1();
-                break;
-            case 2:
-                orderitem2();
-                break;
-            case 3:
-                orderitem3();
-                break;
-            case 4:
-                exit(0);
-                break;
-            default:
-                cout<<endl<<"     INVALID CHOICE"<<endl;
-                cout<<"     ENTER CHOICE"<<endl;
-                cout<<"     ";cin>>ch;
-        }
-    }
+	while(a<=2);
+	if (a>2)
+	{
+		printf("\nSorry you have entered the wrong username and password for four times!!!");
+		
+		getch();
+		
+		}
+		system("cls");
+		
 }
-void order::orderitem1()
-{
-    cout<<"     ENTER QUANTITY"<<endl;
-    cout<<"     ";cin>>qty;cout<<endl;
-    if(snacksqty>=qty)
-    {
-        snacksqty=snacksqty-qty;
-        ofstream temp1("temp1.txt");
-        ifstream snackorder("QUANTITY.txt");
-        while(snackorder>>titem>>tqty)
-        {
-            if(titem!="SNACKS")
-            {
-                temp1<<titem<<' '<<tqty<<endl;
-            }
-            else
-            {
-                temp1<<"SNACKS"<<' '<<snacksqty<<endl;
-            }
-        }
-        temp1.close();
-        snackorder.close();
-        remove("QUANTITY.TXT");
-        rename("temp1.txt","QUANTITY.txt");
-        b.bill1(qty);
-        cout<<"     ORDER ANOTHER ITEM [Y]"<<endl;
-        cout<<"     ";cin>>dec;
-        if(dec=='Y')
-        {
-            orderpage();
-        }
-        else
-        {
-            b.bill();
-        }
-    }
-    else
-    {
-        cout<<endl<<"     NOT AVAILABLE"<<endl;
-        cout<<"     SELECT ANOTHER ITEM"<<endl;
-        cout<<endl<<"     PRESS ANY KEY TO CONTINUE"<<endl;
-        cout<<"     ";getch();
-        system("CLS");
-        gotoxy(40,1);cout<<"MY CANTEEN";
-        gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-        ifstream orderout("QUANTITY.txt");
-        cout<<"     ITEM - QUANTITY"<<endl;
-        cout<<"     ---------------"<<endl;
-        while(orderout>>invtitem>>invtqty)
-        {
-            cout<<"     "<<invtitem<<" - "<<invtqty<<endl;
-        }
-        orderout.close();
-        cout<<endl<<"     PRESS ANY KEY FOR NEW ORDER"<<endl;
-        cout<<"     ";getch();
-        orderpage();
-    }
-}
-void order::orderitem2()
-{
-    cout<<"     ENTER QUANTITY"<<endl;
-    cout<<"     ";cin>>qty;cout<<endl;
-    if(maggiqty>=qty)
-    {
-        maggiqty=maggiqty-qty;
-        ofstream temp2("temp2.txt");
-        ifstream maggiorder("QUANTITY.txt");
-        while(maggiorder>>titem>>tqty)
-        {
-            if(titem!="MAGGI")
-            {
-                temp2<<titem<<' '<<tqty<<endl;
-            }
-            else
-            {
-                temp2<<"MAGGI"<<' '<<maggiqty<<endl;
-            }
-        }
-        temp2.close();
-        maggiorder.close();
-        remove("QUANTITY.TXT");
-        rename("temp2.txt","QUANTITY.txt");
-        b.bill2(qty);
-        cout<<"     ORDER ANOTHER ITEM [Y]"<<endl;
-        cout<<"     ";cin>>dec;
-        if(dec=='Y')
-        {
-            orderpage();
-        }
-        else
-        {
-            b.bill();
-        }
-    }
-    else
-    {
-        cout<<endl<<"     NOT AVAILABLE"<<endl;
-        cout<<"     SELECT ANOTHER ITEM"<<endl;
-        cout<<endl<<"     PRESS ANY KEY TO CONTINUE"<<endl;
-        cout<<"     ";getch();
-        system("CLS");
-        gotoxy(40,1);cout<<"MY CANTEEN";
-        gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-        ifstream orderout("QUANTITY.txt");
-        cout<<"     ITEM - QUANTITY"<<endl;
-        cout<<"     ---------------"<<endl;
-        while(orderout>>invtitem>>invtqty)
-        {
-            cout<<"     "<<invtitem<<" - "<<invtqty<<endl;
-        }
-        orderout.close();
-        cout<<endl<<"     PRESS ANY KEY FOR NEW ORDER"<<endl;
-        cout<<"     ";getch();
-        orderpage();
-    }
-}
-void order::orderitem3()
-{
-    cout<<"     ENTER QUANTITY"<<endl;
-    cout<<"     ";cin>>qty;cout<<endl;
-    if(sdqty>=qty)
-    {
-        sdqty=sdqty-qty;
-        ofstream temp3("temp3.txt");
-        ifstream sdorder("QUANTITY.txt");
-        while(sdorder>>titem>>tqty)
-        {
-            if(titem!="SOFTDRINK")
-            {
-                temp3<<titem<<' '<<tqty<<endl;
-            }
-            else
-            {
-                temp3<<"SOFTDRINK"<<' '<<sdqty<<endl;
-            }
-        }
-        temp3.close();
-        sdorder.close();
-        remove("QUANTITY.TXT");
-        rename("temp3.txt","QUANTITY.txt");
-        b.bill3(qty);
-        cout<<"     ORDER ANOTHER ITEM [Y]"<<endl;
-        cout<<"     ";cin>>dec;
-        if(dec=='Y')
-        {
-            orderpage();
-        }
-        else
-        {
-            b.bill();
-        }
-    }
-    else
-    {
-        cout<<endl<<"     NOT AVIALABLE"<<endl;
-        cout<<"     SELECT ANOTHER ITEM"<<endl;
-        cout<<endl<<"     PRESS ANY KEY TO CONTINUE"<<endl;
-        cout<<"     ";getch();
-        system("CLS");
-        gotoxy(40,1);cout<<"MY CANTEEN";
-        gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-        ifstream orderout("QUANTITY.txt");
-        cout<<"     ITEM - QUANTITY"<<endl;
-        cout<<"     ---------------"<<endl;
-        while(orderout>>invtitem>>invtqty)
-        {
-            cout<<"     "<<invtitem<<" - "<<invtqty<<endl;
-        }
-        orderout.close();
-        cout<<endl<<"     PRESS ANY KEY FOR NEW ORDER"<<endl;
-        cout<<"     ";getch();
-        orderpage();
-    }
-}
-class employee
-{
-    public:
-        int ch,age;
-        char name[50];
-        long int sal;
-        void addemp();
-        void displayemp();
-        void removeemp();
-        void editemp();
-        void emppageswitch();
-        void emppage()
-        {
-            system("CLS");
-            gotoxy(40,1);cout<<"MY CANTEEN";
-            gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-            cout<<"     1. DISPLAY ALL STUDENT DETAILS"<<endl;
-            cout<<"     2. ADD NEW STUDENT DETAILS"<<endl;
-            cout<<"     3. REMOVE OLD STUDENT DETAILS"<<endl;
-            cout<<"     4. VIEW SALES RECORD"<<endl;
-            cout<<"     5. CLEAR SALES RECORD"<<endl;
-            cout<<"     6. STOREPAGE"<<endl;
-            cout<<"     7. EXIT"<<endl<<endl;
-            cout<<"     ENTER CHOICE"<<endl;
-            cout<<"     ";cin>>ch;
-            emppageswitch();
-        }
-};
-void employee::emppageswitch()
-{
-    while(ch!=1||ch!=2||ch!=3||ch!=4||ch!=5)
-    {
-        switch(ch)
-        {
-            case 1:
-                displayemp();
-                break;
-            case 2:
-                addemp();
-                break;
-            case 3:
-                removeemp();
-                break;
-            case 4:
-                {
-                    billing b1;
-                    b1.viewstat();
-                }
-                break;
-            case 5:
-                {
-                    billing b2;
-                    b2.clearstat();
-                }
-            case 6:
-                {
-                    store s;
-                    s.storepage();
-                }
-                break;
-            case 7:
-                exit(0);
-                break;
-            default:
-                cout<<endl<<"     INVALID CHOICE"<<endl;
-                cout<<"     ENTER CHOICE"<<endl;
-                cout<<"     ";cin>>ch;
-        }
-    }
-}
-void employee::addemp()
-{
-    system("CLS");
-    gotoxy(40,1);cout<<"MY CANTEEN";
-    gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-    ofstream newemployee("STUDENT.txt",ios::app);
-    cout<<"     ENTER NAME OF STUDENT"<<endl;
-    cout<<"     ";cin>>name;
-    cin.sync();
-    cout<<"     ENTER AGE OF STUDENT"<<endl;
-    cout<<"     ";cin>>age;
-    cout<<"     ENTER SALARY OF STUDENT"<<endl;
-    cout<<"     ";cin>>sal;
-    newemployee<<name<<' '<<age<<' '<<sal<<endl;
-    newemployee.close();
-    cout<<endl<<"     STUDENT ADDED"<<endl;
-    cout<<endl<<"     PRESS ANY KEY TO CONTINUE";
-    cout<<"     ";getch();
-    emppage();
-}
-void employee::displayemp()
-{
-    system("CLS");
-    gotoxy(40,1);cout<<"MY CANTEEN";
-    gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-    ifstream employee("STUDENT.txt");
-    cout<<"     STUDENT - AGE - SALARY"<<endl;
-    cout<<"     -----------------------"<<endl;
-    while (employee>>name>>age>>sal)
-    {
-        cout<<"     "<<name<<" - "<<age<<" - "<<sal<<endl ;
-    }
-    employee.close();
-    cout<<endl<<"     PRESS ANY KEY TO CONTINUE"<<endl;
-    cout<<"     ";getch();
-    emppage();
-}
-void employee::removeemp()
-{
-    system("CLS");
-    gotoxy(40,1);cout<<"MY CANTEEN";
-    gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-    char tname[50];
-    ifstream emp1("STUDENT.txt");
-    ofstream emp2("temp.txt");
-    cout<<"     ENTER THE NAME OF STUDENT WISH TO REMOVE"<<endl;
-    cout<<"     ";cin>>tname;
-    while(emp1>>name>>age>>sal)
-    {
-        if(strcmp(name,tname)!=0)
-        {
-            emp2<<name<<' '<<age<<' '<<sal<<endl;
-        }
-    }
-    emp1.close();
-    emp2.close();
-    remove("STUDENT.txt");
-    rename("temp.txt","STUDENT.txt");
-    cout<<endl<<"     STUDENT REMOVED"<<endl;
-    cout<<endl<<"     PRESS ANY KEY TO CONTINUE"<<endl;
-    cout<<"     ";getch();
-    emppage();
-}
-class login
-{
-  public:
-      string pass="";
-      int ch;
-      char c;
-      void loginpageswitch();
-      void homepageswitch();
-      void employeelogin();
-      void ownerlogin();
-      void emp();
-      void own();
-      void homepage()
-      {
-          system("CLS");
-          gotoxy(40,1);cout<<"WELCOME TO MY CANTEEN";
-          gotoxy(40,2);cout<<"----------------------------"<<endl<<endl;
-          cout<<"     1. LOGIN"<<endl;
-          cout<<"     2. EXIT"<<endl<<endl;
-          cout<<"     ENTER CHOICE"<<endl;
-          cout<<"     ";cin>>ch;
-          homepageswitch();
-      }
-      void loginpage()
-      {
-          system("CLS");
-          gotoxy(40,1);cout<<"MY CANTEEN";
-          gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-          cout<<"     1. OWNER LOGIN"<<endl;
-          cout<<"     2. STUDENT LOGIN"<<endl;
-          cout<<"     3. EXIT"<<endl<<endl;
-          cout<<"     ENTER CHOICE"<<endl;
-          cout<<"     ";cin>>ch;
-          loginpageswitch();
-      }
-};
-void login::homepageswitch()
-{
-    while(ch!=1||ch!=2)
-    {
-        switch(ch)
-        {
-        case 1:
-            loginpage();
-            break;
-        case 2:
-            exit(0);
-            break;
-        default:
-            cout<<endl<<"     INVALID CHOICE"<<endl;
-            cout<<"     ENTER CHOICE"<<endl;
-            cout<<"     ";cin>>ch;
-        }
-    }
-}
-void login::loginpageswitch()
-{
-    while(ch!=1||ch!=2||ch!=3)
-    {
-        switch(ch)
-        {
-            case 1:
-                ownerlogin();
-                break;
-            case 2:
-                employeelogin();
-                break;
-            case 3:
-                exit(0);
-                break;
-            default:
-                cout<<endl<<"     INVALID CHOICE"<<endl;
-                cout<<"     ENTER CHOICE"<<endl;
-                cout<<"     ";cin>>ch;
-        }
-    }
-}
-void login::ownerlogin()
-{
-    while(pass!="MADJ@21")
-    {
-        pass="";
-        cout<<endl<<"     ENTER OWNER PASSWORD"<<endl;
-        cout<<"     ";c=_getch();
-        while(c!=13)
-        {
-            pass.push_back(c);
-            cout<<"*";
-            c=getch();
-        }
-        if(pass=="admin")
-         {
-             cout<<endl<<"     OWNER ACCESS GRANTED"<<endl;
-             cout<<endl<<"     PRESS ANY KEY TO CONTINUE"<<endl;
-             cout<<"     ";getch();
-             own();
-         }
-        else
-        {
-            cout<<endl<<"     INVALID PASSWORD"<<endl;
-        }
-    }
-}
-void login::employeelogin()
-{
-    while(pass!="employee")
-    {
-        pass="";
-        cout<<"     ENTER STUDENT PASSWORD"<<endl;
-        cout<<"     ";c=_getch();
-        while(c!=13)
-        {
-            pass.push_back(c);
-            cout<<"*";
-            c=getch();
-        }
-        if(pass=="employee")
-        {
-            cout<<endl<<"     STUDENT ACCESS GRANTED"<<endl;
-            cout<<endl<<"     PRESS ANY KEY TO CONTINUE"<<endl;
-            cout<<"     ";getch();
-            emp();
-        }
-        else
-        {
-            cout<<endl<<"     INVALID PASSSWORD"<<endl;
-        }
-    }
-}
-void login::emp()
-{
-    store s;
-    s.storepage();
-}
-void login::own()
-{
-    employee e;
-    e.emppage();
-}
-void billpage()
-{
-    int ch;
-    system("CLS");
-    gotoxy(40,1);cout<<"MY CANTEEN";
-    gotoxy(40,2);cout<<"-----------------"<<endl<<endl;
-    cout<<"     1. NEW ORDER"<<endl;
-    cout<<"     2. EXIT"<<endl<<endl;
-    cout<<"     ENTER CHOICE"<<endl;
-    cout<<"     ";cin>>ch;
-    while(ch!=1||ch!=2)
-    {
-        switch(ch)
-        {
-            case 1:
-                {
-                    order o;
-                    o.orderpage();
-                }
-                break;
-            case 2:
-                exit(0);
-                break;
-            default:
-                cout<<endl<<"     INVALID CHOICE"<<endl;
-                cout<<"     ENTER CHOICE"<<endl;
-                cout<<"     ";cin>>ch;
-        }
-    }
-}
-void handlecust()
-{
-    order o;
-    o.orderpage();
-}
-void billjump()
-{
-    billing b;
-    b.viewstat();
-}
-void empjump()
-{
-    employee e;
-    e.emppage();
-}
+
+
+
+
+/*start of main*/
 int main()
 {
-    system("title CANTEEN MANAGEMENT SYSYTEM");
-    system("color 71");
-    login l;
-    l.homepage();
+	login();
+    d_mainmenu();
     return 0;
+}
+
+void d_mainmenu()
+{
+    int i;
+    char ch;
+    const char *menu[]= {"   Calculate Bill","   Order Items","   Edit Items","   Display Orders  ","   Search Orders", "   Delete Orders","   Exit"};
+    system("cls");
+//textbackground(11);
+//textcolor(0);
+//_setcursortype(_NOCURSOR);
+    window(25,50,20,32);
+    gotoxy(33,18);
+    printf("CAFE MENU");
+    for (i=0; i<=6; i++)
+    {
+        gotoxy(30,22+i+1);
+        printf("%s\n\n\n",menu[i]);
+    }
+    curser(7);
+}
+
+void d_search()
+{
+    char ch;
+    int i;
+    const char *menu[]= {"   By Code","   By Rate","   By Quantity","   Back to main menu"};
+    system("cls");
+//textbackground(11);
+//textcolor(0);
+    window(25,50,20,32);
+    gotoxy(33,18);
+    printf("SEARCH MENU");
+    for (i=0; i<=3; i++)
+    {
+        gotoxy(30,22+i+1);
+        printf("%s\n\n\n",menu[i]);
+    }
+    curser(4);
+}
+
+/*function for cursor movement*/
+void curser(int no)
+{
+    int count=1;
+    char ch='0';
+    gotoxy(30,23);
+    while(1)
+    {
+        switch(ch)
+        {
+        case 80:
+            count++;
+            if (count==no+1) count=1;
+            break;
+        case 72:
+            count--;
+            if(count==0) count=no;
+            break;
+        }
+        highlight(no,count);
+        ch=getch();
+        if(ch=='\r')
+        {
+            if(no==7)
+            {
+                if (count==1) bill() ;
+                else if(count==2) add();
+                else if(count==3) edit();
+                else if (count==4) d_all();
+                else if (count==5) d_search();
+                else if (count==6) del();
+                else   exit(0);
+            }
+            if(no==4)
+            {
+                if (count==1) d_code();
+                else if (count==2)d_rate();
+                else if (count==3) d_quan();
+                else d_mainmenu();
+            }
+        }
+    }
+}
+
+void highlight(int no,int count)
+{
+    if (no==4)
+    {
+        //textbackground(11);
+        //textcolor(0);
+        gotoxy(30,23);
+        printf("   By Code          ");
+        gotoxy(30,24);
+        printf("   By Rate          ");
+        gotoxy(30,25);
+        printf("   By Quantity      ");
+        gotoxy(30,26);
+        printf("   Back to main menu");
+        //textcolor(0);
+        //textbackground(2);
+        switch (count)
+        {
+        case 1:
+            gotoxy(30,23);
+            printf(" - By Code          ");
+            break;
+        case 2:
+            gotoxy(30,24);
+            printf(" - By Rate          ");
+            break;
+        case 3:
+            gotoxy(30,25);
+            printf(" - By Quantity      ");
+            break;
+        case 4:
+            gotoxy(30,26);
+            printf(" - Back to main menu");
+            break;
+        }
+    }
+
+    if(no==7)
+    {
+        //textbackground(11);
+        //textcolor(0);
+        gotoxy (30,23);
+        printf("   Calculate Bill ");
+        gotoxy (30,24);
+        printf("   Add Orders      ");
+        gotoxy (30,25);
+        printf("   Edit Orders     ");
+        gotoxy (30,26);
+        printf("   Display Orders   ");
+        gotoxy (30,27);
+        printf("   Search         ");
+        gotoxy (30,28);
+        printf("   Delete Orders  ");
+        gotoxy (30,29);
+        printf("   Exit           ");
+        //textcolor(0);
+        //textbackground(2);
+        switch(count)
+        {
+        case 1:
+            gotoxy (30,23);
+            printf(" - Calculate Bill ");
+            break;
+        case 2:
+            gotoxy (30,24);
+            printf(" - Add Orders      ");
+            break;
+        case 3:
+            gotoxy (30,25);
+            printf(" - Edit Orders    ");
+            break;
+        case 4:
+            gotoxy (30,26);
+            printf(" - Display Orders    ");
+            break;
+        case 5:
+            gotoxy (30,27);
+            printf(" - Search         ");
+            break;
+        case 6:
+            gotoxy (30,28);
+            printf(" - Delete Orders   ");
+            break;
+        case 7:
+            gotoxy (30,29);
+            printf(" - Exit           ");
+            break;
+        }
+    }
+}
+
+void bill()
+{
+    char x[4]= {0};
+    int j=29,q=0,size=0,i=1;
+    float total=0,gtotal=0;
+    FILE *file;
+    file=fopen("record.txt","r+b");
+    rewind(file);
+    system("cls");
+    dbill();
+    gotoxy(26,15);
+    printf("Enter  \"end\" to finish input");
+    while(1)
+    {
+        gotoxy(25,18);
+        printf("                    ");
+        gotoxy(25,19);
+        printf("                    ");
+        gotoxy(25,18);
+        printf("Enter Item Code:");
+        scanf("%s",x);
+        if(strcmp(x,"end")==0)
+            break;
+        gotoxy(25,19);
+        printf("Enter Quantity:");
+        scanf("%d",&q);
+        rewind(file);
+        while(fread(&item,sizeof(item),1,file))
+        {
+            if((strcmp(item.code,x)==0))
+            {
+                total=item.rate*q;
+                gotoxy(11,j);
+                printf("%4d",i);
+                printf("%9s",item.name);
+                printf("%13d",q);
+                printf("%15.2f",item.rate);
+                printf("%13.2f",total);
+                gtotal=gtotal+total;
+                size=sizeof(item);
+                item.quantity=item.quantity-q;
+                j+=2;
+                i++;
+                fseek(file,-size,SEEK_CUR);
+                fwrite(&item,sizeof(item),1,file);
+                break;
+            }
+        }
+    }
+    if(gtotal!=0)
+    {
+        gotoxy(30,j+5);
+        printf("TOTAL AMOUNT = NRs. %6.2f",gtotal);
+    }
+    fclose(file);
+    getch();
+    d_mainmenu();
+}
+/*function to display bill window*/
+void dbill()
+{
+    int i;
+    gotoxy(20,10);
+//;
+    for (i=1; i<=10; i++)
+        printf("-");
+    printf(" ABC ");
+    for (i=1; i<=10; i++)
+        printf("-");
+    printf("\n\n");
+    gotoxy(30,11);
+    printf("CAFE");
+//textcolor(1);
+    gotoxy(32,25);
+    printf("CUSTOMER'S BILL") ;
+//textcolor(8);
+    gotoxy(13,27);
+    printf("SN.   Item Name     Quantity     Rate          Total");
+
+}
+/*function to add records*/
+void add ()
+{
+    FILE *file;
+    char y[ACS],x[12];
+    system("cls");
+//textbackground(11);
+//textcolor(0);
+    gotoxy(25,25);
+    printf("Enter New Record(Y/N)?");
+    while(toupper(getche())=='Y')
+    {
+        system("cls");
+        file=fopen("record.txt","ab");
+        c_code(y);
+        strcpy(item.code,y);
+        gotoxy(22,28);
+        printf("Enter Rate Of The Item:");
+        scanf("%f",&item.rate);
+        gotoxy(22,30);
+        printf("Enter Quantity Of The Item:");
+        scanf("%d",&item.quantity);
+        gotoxy(22,32);
+        printf("Enter Name Of The Item:");
+        scanf("%s",item.name);
+        fseek(file,0,SEEK_END);
+        fwrite(&item,sizeof(item),1,file);
+        fclose(file);
+        gotoxy(22,34);
+        printf("Enter New Record(Y/N)?");
+
+    }
+    d_mainmenu();
+}
+
+/*function to check availability of code*/
+void c_code(char y[])
+{
+    int flag;
+    FILE *file;
+    file=fopen("record.txt","rb");
+    while(1)
+    {
+        system("cls");
+        window(20,58,23,36);
+        gotoxy(32,18);
+        printf(" ADD ORDERS ")  ;
+        flag=1;
+        rewind(file);
+        gotoxy(22,25);
+        printf("Enter New Code Of Item:");
+        scanf(" %[^\n]",y);
+        while(fread(&item,sizeof(item),1,file)==1)
+        {
+            if (strcmp(y,item.code)==0)
+            {
+                flag=0;
+                gotoxy(26,30);
+                printf("Code Already Exists");
+                gotoxy(29,32);
+                printf("Enter Again");
+                getch();
+                break;
+            }
+        }
+        if (flag==1)
+            break;
+    }
+}
+
+/*function for editing*/
+void edit()
+{
+    int flag=0,choice;
+    char x[ACS],y[ACS];
+    FILE *file;
+    int size;
+    system("cls");
+//textcolor(0);
+//textbackground(11);
+    window(20,63,20,46);
+    gotoxy(35,18);
+    printf("EDIT ORDERS");
+    ;
+    gotoxy(25,23);
+    printf("Enter Item Code: ");
+    scanf("%s",x);
+    flag=check(x);
+    if(flag==0)
+    {
+        file=fopen("record.txt","r+b");
+        rewind(file);
+        while (fread(&item,sizeof (item),1,file))
+        {
+            if(strcmp(item.code,x)==0)
+            {
+                //textcolor(0);
+                gotoxy(25,27);
+                printf("name       = %s",item.name);
+                gotoxy(25,28);
+                printf("code       = %s",item.code);
+                gotoxy(25,29);
+                printf("rate       = %g",item.rate);
+                gotoxy(25,30);
+                printf("quantity   = %d",item.quantity);
+                gotoxy(25,32);;
+                printf("Do You Want To Edit This Record?(y/n):");
+                fflush(file);
+                if(toupper(getche())=='Y')
+                {
+                    //textcolor(0);
+                    gotoxy(25,34);
+                    printf("1- Edit Name ");
+                    gotoxy(25,35);
+                    printf("2- Edit Code ");
+                    gotoxy(25,36);
+                    printf("3- Edit Rate ");
+                    gotoxy(25,37);
+                    printf("4- Edit Quantity ");
+                    gotoxy(25,39);  ;
+                    printf(" Enter Your Choice(1, 2, 3, 4) ");
+                    scanf("%d",&choice);
+                    switch(choice)
+                    {
+                    case 1:
+                        system("cls");
+                        window(23,48,20,40);
+                        gotoxy(35,18);
+                        printf("EDIT RECORDS");
+                        gotoxy(25,24);
+                        printf(" Enter New Name: ");
+                        scanf("%s",item.name);
+                        size=sizeof(item);
+                        fseek(file,-size,SEEK_CUR);
+                        fwrite(&item,sizeof(item),1,file);
+                        break;
+                    case 2:
+                        system("cls");
+                        window(23,65,20,40);
+                        gotoxy(35,18);
+                        printf("EDIT RECORDS");
+                        gotoxy(25,24);
+                        c_code(y);
+                        strcpy(item.code,y);
+                        size=sizeof(item);
+                        fseek(file,-size,SEEK_CUR);
+                        fwrite(&item,sizeof(item),1,file);
+                        break;
+                    case 3:
+                        system("cls");
+                        window(23,65,20,40);
+                        gotoxy(35,18);
+                        printf("EDIT RECORDS");
+                        gotoxy(25,24);
+                        printf(" Enter New Rate: ");
+                        scanf("%f",&item.rate);
+                        size=sizeof(item);
+                        fseek(file,-size,SEEK_CUR);
+                        fwrite(&item,sizeof(item),1,file);
+                        break;
+                    case 4:
+                        system("cls");
+                        window(23,65,20,40);
+                        gotoxy(35,18);
+                        printf("EDIT RECORDS");
+                        gotoxy(25,24);
+                        printf(" Enter New Quantity: ");
+                        scanf("%d",&item.quantity);
+                        size=sizeof(item);
+                        fseek(file,-size,1);
+                        fwrite(&item,sizeof(item),1,file);
+                        break;
+                    }
+                    gotoxy(27,30);
+                    printf("--- Item Edited---");
+                    break;
+                }
+            }
+        }
+    }
+    if (flag==1)
+    {
+        gotoxy(32,30);
+        printf("Item Does Not Exist.");
+        gotoxy(36,32);
+        printf("TRY AGAIN");
+    }
+    getch();
+    fclose(file);
+    d_mainmenu();
+}
+
+/*function to display all records*/
+void d_all()
+{
+    int i,j=1;
+    FILE *file;
+    dis_con();
+    file=fopen("record.txt","rb");
+    rewind(file);
+    i=26;
+    fflush(file);
+    while(fread(&item,sizeof(item),1,file))
+    {
+        display(&item,i,j);
+        i++;
+        j++;
+        if ((j%20)==0)
+        {
+            gotoxy(27,47);/*textcolor(0)*/;
+            printf("Press Any Key To See More...........");
+            getch();
+            system("cls");
+            dis_con();
+            i=26;
+            continue;
+        }
+    }
+    getch();
+    if (i==26)
+    {
+        gotoxy(24,30);
+        printf("-- No Order Found --");
+    }
+    getch();
+    fclose(file);
+    d_mainmenu();
+}
+
+/*function to display by quantity*/
+void d_quan()
+{
+    int i,j=1;
+    int a,b;
+    FILE *file;
+    dis_con();
+    file=fopen("record.txt","rb");
+    rewind(file);
+    i=26;
+    gotoxy(16,20);;
+    printf("Enter Lower Range: ");
+    scanf("%d",&a);
+    gotoxy(16,21);
+    printf("Enter Upper Range:");
+    scanf("%d",&b);
+    fflush(file);
+    while(fread(&item,sizeof(item),1,file))
+    {
+        if((item.quantity>=a)&&(item.quantity<=b))
+        {
+            display(&item,i,j);
+            i++;
+            j++;
+            if ((j%20)==0)
+            {
+                gotoxy(27,47);
+                printf("Press Any Key To See More......");
+                getch();
+                system("cls");
+                dis_con();
+                i=26;
+                continue;
+            }
+        }
+    }
+    getch();
+    if (i==26)
+    {
+        gotoxy(28,30);
+        printf(" No Items Found.");
+    }
+    getch();
+    d_search();
+    fclose(file);
+}
+
+/*function to display by rate*/
+void d_rate()
+{
+    int i,j=1;
+    float a,b;
+    FILE *file;
+    dis_con();
+    file=fopen("record.txt","rb");
+    rewind(file);
+    i=26;
+    gotoxy(16,20);;
+    printf("Enter Lower Range: ");
+    scanf("%f",&a);
+    gotoxy(16,21);
+    printf("Enter Upper Range: ");
+    scanf("%f",&b);
+    fflush(file);
+    while(fread(&item,sizeof(item),1,file))
+    {
+        if((item.rate>=a)&&(item.rate<=b))
+        {
+            display(&item,i,j);
+            i++;
+            j++;
+            if ((j%20)==0)
+            {
+                gotoxy(27,47);
+                printf("Press Any Key To See More.....");
+                getch();
+                system("cls");
+                dis_con();
+                i=26;
+                continue;
+            }
+        }
+    }
+    getch();
+    if (i==26)
+    {
+        gotoxy(28,30);
+        printf(" No Item Found ");
+    }
+    getch();
+    fclose(file);
+    d_search();
+}
+
+/*function to display by code*/
+void d_code()
+{
+    int i,j=1;
+    char x[4]= {0};
+    FILE *file;
+    dis_con();
+    file=fopen("record.txt","rb");
+    rewind(file);
+    i=26;
+    gotoxy(16,20);;
+    printf("Enter Item Code: ");
+    scanf("%s",x);
+    fflush(file);
+    while(fread(&item,sizeof(item),1,file))
+    {
+        if((strcmp(item.code,x)==0))
+        {
+            display(&item,i,j);
+            i++;
+            j++;
+            break;
+        }
+    }
+    if (i==26)
+    {
+        gotoxy(28,30);
+        printf("No Item Found");
+    }
+    getch();
+    fclose(file);
+    d_search();
+}
+
+/*function to display window for item display*/
+void dis_con()
+{
+    int i;
+    system("cls");
+    gotoxy(20,10);
+    ;
+    for (i=1; i<=10; i++)
+        printf("\xdb");
+    printf(" ABC ");
+    for (i=1; i<=10; i++)
+        printf("\xdb");
+    printf("\n\n");
+    gotoxy(30,11);
+    printf(" CAFE");
+//textcolor(1);
+    gotoxy(32,17);
+    printf("DISPLAYING ALL ORDERS") ;
+//textcolor(8);
+    gotoxy(18,23);
+    printf ("SN.   Item Name   Item Code      Rate     Quantity");
+}
+
+/*function to display in screen*/
+void display(rec *item,int i,int j)
+{
+    gotoxy(16,i);//textcolor(13);
+    printf("%4d",j);
+    printf("%9s",item->name);
+    printf("%12s",item->code);
+    printf("%14.2f",item->rate);
+    printf("%11d",item->quantity);
+}
+
+/*function to delete records*/
+void del()
+{
+    int flag;
+    char x[ANS];
+    FILE *file,*file1;
+    system("cls");
+//textbackground(11);
+//textcolor(0);
+    window(23,51,25,34);
+    gotoxy(29,18);
+    printf("DELETE ORDERS");
+    gotoxy(27,27);
+    printf("Enter Item Code: ");
+    scanf("%s",x);
+    flag=check(x);
+    if(flag==0)
+    {
+        file1=fopen("record1.txt","ab");
+        file=fopen("record.txt","rb");
+        rewind(file);
+        while (fread(&item,sizeof (item),1,file))
+        {
+            if(strcmp(item.code,x)!=0)
+                fwrite(&item,sizeof(item),1,file1);
+        }
+        gotoxy(27,29);
+        printf("---Item Deleted---");
+        remove("record.txt");
+        rename("record1.txt","record.txt");
+    }
+    if (flag==1)
+    {
+        gotoxy(25,29);
+        printf("---Item Does Not Exist---");
+        gotoxy(30,31);
+        printf("TRY AGAIN");
+    }
+    fclose(file1);
+    fclose(file);
+    getch();
+    d_mainmenu();
+}
+
+/*function to check validity of code while editing and deleting*/
+int check(char x[ANS])
+{
+    FILE *file;
+    int flag=1;
+    file=fopen("record.txt","rb");
+    rewind(file);
+    while (fread(&item,sizeof (item),1,file))
+    {
+        if(strcmp(item.code,x)==0)
+        {
+            flag=0;
+            break;
+        }
+    }
+    fclose(file);
+    return flag;
+}
+
+/*function to display box*/
+void window(int a,int b,int c,int d)
+{
+    int i;
+    system("cls");
+    gotoxy(20,10);
+//textcolor(1);
+    for (i=1; i<=10; i++)
+        printf("\xdb");
+    printf(" WELCOME TO ABC ");
+    for (i=1; i<=10; i++)
+        printf("\xdb");
+    printf("\n\n");
+    gotoxy(30,11);
+    printf("CAFETERIA ORDER SYSTEM");
+//textcolor(4);
+    for (i=a; i<=b; i++)
+    {
+        gotoxy(i,17);
+        printf("\xdb");
+        gotoxy(i,19);
+        printf("\xdb");
+        gotoxy(i,c);
+        printf("\xdb");
+        gotoxy(i,d);
+        printf("\xdb");
+    }
+
+    gotoxy(a,17);
+    printf("\xdb");
+    gotoxy(a,18);
+    printf("\xdb");
+    gotoxy(a,19);
+    printf("\xdb");
+    gotoxy(b,17);
+    printf("\xdb");
+    gotoxy(b,18);
+    printf("\xdb");
+    gotoxy(b,19);
+    printf("\xdb");
+//textcolor(4);
+    for(i=c; i<=d; i++)
+    {
+        gotoxy(a,i);
+        printf("\xdb");
+        gotoxy(b,i);
+        printf("\xdb");
+    }
+    gotoxy(a,c);
+    printf("\xdb");
+    gotoxy(a,d);
+    printf("\xdb");
+    gotoxy(b,c);
+    printf("\xdb");
+    gotoxy(b,d);
+    printf("\xdb");
+//textbackground(11);
+//textcolor(0);
 }
