@@ -9,9 +9,5 @@ Easy to operate and understandable.
 
 # Admin 
 
-Owner Password: admin
-
-Employee Password: employee
-
-
-Moreover, this document file also contains project Synopsis, Reports, and various diagrams. Besides, it also consists of an abstract pdf file inside the zip where the link below the page will document. The report file also contains Entity-Relationship (ER) diagrams, data flow diagram (DFD), sequence diagram, and Software Requirement Specification (SRS).
+Owner :  user
+password : pass
